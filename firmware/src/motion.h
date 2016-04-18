@@ -8,6 +8,12 @@ extern float l1[4], l2[4], l3[4];
 void motion_init();
 void motion_tick(float t);
 
+//Moves
+#define NO_MOVE 0
+#define HELLO_MOVE 1
+bool moves_tick(float t, int move);
+bool helloMove(float t);
+
 // Resets the motion
 void motion_reset();
 

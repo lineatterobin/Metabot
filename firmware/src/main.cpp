@@ -19,6 +19,7 @@ bool isUSB = false;
 
 // Time
 TERMINAL_PARAMETER_FLOAT(t, "Time", 0.0);
+TERMINAL_PARAMETER_FLOAT(moves_t, "Time for special moves", 0.0);
 
 TERMINAL_COMMAND(version, "Getting firmware version")
 {
@@ -49,6 +50,13 @@ TERMINAL_PARAMETER_BOOL(move, "Enable/Disable move", true);
 
 // Average voltage
 TERMINAL_PARAMETER_INT(voltage, "Average voltage (dV)", 75);
+
+int specialMove = NO_MOVE;
+TERMINAL_COMMAND(hello, "Enable Hello movement")
+{
+    specialMove = HELLO_MOVE;
+    moves_t = 0;
+}
 
 /**
  * Initializing
@@ -113,16 +121,29 @@ void tick()
         return;
     }
 
-    // Incrementing and normalizing t
-    t += motion_get_f()*0.02;
-    if (t > 1.0) {
-        t -= 1.0;
-        colorize();
-    }
-    if (t < 0.0) t += 1.0;
 
-    motion_tick(t);
-   
+    if (moves_t < 9999)
+    {
+        if (moves_tick(moves_t, specialMove))
+        {
+            moves_t = 9999;
+            specialMove = NO_MOVE;
+        }
+        else
+            moves_t++;
+    }
+    else
+    {
+        // Incrementing and normalizing t
+        t += motion_get_f()*0.02;
+        if (t > 1.0) {
+            t -= 1.0;
+            colorize();
+        }
+        if (t < 0.0) t += 1.0;
+
+        motion_tick(t);
+    }
     // Sending order to servos
     dxl_set_position(mapping[0], l1[0]);
     dxl_set_position(mapping[3], l1[1]);

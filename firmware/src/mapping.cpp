@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "config.h"
+#include "motion.h"
 #include "mapping.h"
 #include "leds.h"
 #ifndef __EMSCRIPTEN__
@@ -12,8 +13,20 @@ static uint8_t currentMapping = 0;
 // This is the servo mappings
 uint8_t mapping[12];
 
+TERMINAL_PARAMETER_INT(color, "Robot's color", LED_R|LED_G|LED_B);
+
+TERMINAL_COMMAND(toggleColorfront, "Toggle colored front legs")
+{
+    if(!leds_are_custom()) {
+        led_set(color, true);
+    }
+    else {
+        leds_decustom();
+    }
+}
+
 /**
- * Colorizes the two front legs
+ * Colorizes the robot
  */
 void colorize()
 {
@@ -24,6 +37,9 @@ void colorize()
         for (int i=6; i<12; i++) {
             led_set(mapping[i], 0);
         }
+    }
+    else {
+        led_set_all(color, true);
     }
 }
 
@@ -42,7 +58,7 @@ void remap(int direction)
 
 #ifndef __EMSCRIPTEN__
 TERMINAL_COMMAND(remap,
-        "Changes the mapping")
+                 "Changes the mapping")
 {
     if (argc == 0) {
         terminal_io()->print("remap=");

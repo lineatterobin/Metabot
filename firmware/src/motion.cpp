@@ -26,6 +26,7 @@
 #include "mapping.h"
 #include "leds.h"
 #include "motors.h"
+#include "music.h"
 
 // Angles for the legs motor
 float l1[4], l2[4], l3[4];
@@ -36,15 +37,15 @@ float motion_get_motor(int idx)
 {
     int c = (idx%3);
     switch (c) {
-        case 0:
-            return (l1[idx/3]);
-            break;
-        case 1:
-            return (l2[idx/3]);
-            break;
-        case 2:
-            return (l3[idx/3]);
-            break;
+    case 0:
+        return (l1[idx/3]);
+        break;
+    case 1:
+        return (l2[idx/3]);
+        break;
+    case 2:
+        return (l3[idx/3]);
+        break;
     }
 
     return 0;
@@ -77,6 +78,8 @@ TERMINAL_PARAMETER_FLOAT(turn, "Turn", 0.0);
 // Front delta h
 TERMINAL_PARAMETER_FLOAT(frontH, "Front delta H", 0.0);
 
+TERMINAL_PARAMETER_FLOAT(smoothBackLegs, "Smooth 180", 0.0);
+
 #ifdef HAS_TERMINAL
 TERMINAL_COMMAND(toggleBackLegs, "Toggle back legs")
 {
@@ -94,7 +97,24 @@ TERMINAL_COMMAND(toggleCrab, "Toggle crab mode")
 // Gait selector
 #define GAIT_WALK       0
 #define GAIT_TROT       1
-TERMINAL_PARAMETER_INT(gait, "Gait (0:walk, 1:trot)", GAIT_TROT);
+
+#define GAIT_MUSIC     2
+
+TERMINAL_PARAMETER_INT(gait, "Gait (0:walk, 1:trot, 2:music)", GAIT_TROT);
+
+TERMINAL_COMMAND(music, "change to gait music")
+{
+    gait = GAIT_MUSIC;
+    h = -20;
+    dx = 0;
+    dy = 0;
+}
+TERMINAL_COMMAND(trot, "change to gait trot")
+{
+    gait = GAIT_TROT;
+    h = -55;
+    freq = 2.0;
+}
 
 // Functions
 Function rise;
@@ -124,7 +144,7 @@ void setup_functions()
         step.addPoint(1.0, -0.5);
     }
 
-    if (gait == GAIT_TROT) {
+    if (gait == GAIT_TROT || gait == GAIT_MUSIC) {
         // Rising the legs
         rise.addPoint(0.0, 1.0);
         rise.addPoint(0.3, 1.0);
@@ -147,7 +167,7 @@ void setup_functions()
          rise.addPoint(0.4, 1.0);
          rise.addPoint(0.5, 0.0);
          rise.addPoint(1.0, 0.0);
- 
+
          // Taking the leg forward
          step.addPoint(0.0, -0.5);
          step.addPoint(0.1, -0.5);
@@ -156,8 +176,6 @@ void setup_functions()
          */
     }
 }
-
-TERMINAL_PARAMETER_FLOAT(smoothBackLegs, "Smooth 180", 0.0);
 
 // Extra values
 float extra_h = 0;
@@ -216,6 +234,9 @@ void motion_tick(float t)
         if (gait == GAIT_TROT) {
             legPhase = t + group*0.5;
         }
+        if (gait == GAIT_MUSIC) {
+            legPhase = t;
+        }
 
         float x, y, z, a, b, c;
 
@@ -228,22 +249,22 @@ void motion_tick(float t)
         // Add the radius to the leg, in the right direction
         float nr = (r+extra_r);
         switch (i) {
-            case 0:
-                X += cos(M_PI/4)*nr;
-                Y += cos(M_PI/4)*nr;
-                break;
-            case 1:
-                X += cos(M_PI/4)*nr;
-                Y -= cos(M_PI/4)*nr;
-                break;
-            case 2:
-                X -= cos(M_PI/4)*nr;
-                Y -= cos(M_PI/4)*nr;
-                break;
-            case 3:
-                X -= cos(M_PI/4)*nr;
-                Y += cos(M_PI/4)*nr;
-                break;
+        case 0:
+            X += cos(M_PI/4)*nr;
+            Y += cos(M_PI/4)*nr;
+            break;
+        case 1:
+            X += cos(M_PI/4)*nr;
+            Y -= cos(M_PI/4)*nr;
+            break;
+        case 2:
+            X -= cos(M_PI/4)*nr;
+            Y -= cos(M_PI/4)*nr;
+            break;
+        case 3:
+            X -= cos(M_PI/4)*nr;
+            Y += cos(M_PI/4)*nr;
+            break;
         }
 
         // Rotate around the center of the robot
@@ -268,12 +289,140 @@ void motion_tick(float t)
         if (i < 2) z += frontH;
 
         // Computing inverse kinematics
-        if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
-            l1[i] = -signs[0]*a;
-            l2[i] = -signs[1]*b;
-            l3[i] = -signs[2]*(c - 180*smoothBackLegs);
+        if(gait == GAIT_MUSIC) {
+            if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
+                l1[i] = -signs[0]*(a + motion_music(1,i));
+                l2[i] = -signs[1]*(b + motion_music(2,i));
+                l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_music(3,i));
+            }
+        }
+        else {
+            if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
+                l1[i] = -signs[0]*a;
+                l2[i] = -signs[1]*b;
+                l3[i] = -signs[2]*(c - 180*smoothBackLegs);
+            }
         }
     }
+}
+
+bool moves_tick(float t, int specialMove)
+{
+    switch(specialMove)
+    {
+    case HELLO_MOVE:
+        return helloMove(t);
+        break;
+    default:
+        return true;
+        break;
+    }
+}
+
+float xMove[4], yMove[4], zMove[4];
+
+bool helloMove(float t)
+{
+    float a, b, c;
+    float extra = 0.0;
+
+    //Evolution du ouvement
+    for (int i = 0; i < 4; i++)
+    {
+        // This is the x,y,z order in the referencial of the leg
+        if(t==0)
+        {
+            xMove[i] = 90.0;
+            yMove[i] = 0.0;
+            zMove[i] = h;
+        }
+
+        switch (i) {
+        case 0:
+            if (t<50)
+            {
+                zMove[i] += 3.5;
+                xMove[i] -= 0.5;
+            }
+            else if (t<75)
+            {
+                extra = (t-50);
+            }
+            else if (t<125)
+            {
+                extra = 25-(t-75);
+            }
+            else if (t<175)
+            {
+                extra = -25+(t-125);
+            }
+            else if (t<225)
+            {
+                extra = 25-(t-175);
+            }
+            else if (t<275)
+            {
+                extra = -25+(t-225);
+            }
+            else if (t<325)
+            {
+                extra = 25-(t-275);
+            }
+            else if (t<375)
+            {
+                extra = -25+(t-325);
+            }
+            else if (t<425)
+            {
+                extra = 25-(t-375);
+            }
+            else if (t<450)
+            {
+                extra = -25+(t-425);
+            }
+            else if (t>450)
+            {
+                zMove[i] -= 3.5;
+                xMove[i] += 0.5;
+            }
+            break;
+        case 1:
+            if (t<50)
+                yMove[i] += 1;
+            else if (t>450)
+                yMove[i] -= 1;
+            extra = 0;
+            break;
+        case 2:
+            break;
+            extra = 0;
+        case 3:
+            if (t<50)
+                yMove[i] -= 1;
+            else if (t>450)
+                yMove[i] += 1;
+            extra = 0;
+            break;
+        }
+        if (computeIK(xMove[i], yMove[i], zMove[i], &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
+            l1[i] = -signs[0]*a;
+            l2[i] = -signs[1]*b;
+            l3[i] = -signs[2]*(c - 180*smoothBackLegs) + extra;
+//            if(i = 0)
+//            {
+//                l3[i] = -signs[2]*(c - 180*smoothBackLegs) + extra;
+//            }
+//            else
+//                l3[i] = -signs[2]*(c - 180*smoothBackLegs);
+        }
+        else {
+            led_set_all(LED_R, true);
+        }
+    }
+    if(t == 500)
+        return true;
+    else
+        return false;
 }
 
 void motion_reset()
