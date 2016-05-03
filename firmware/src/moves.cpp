@@ -30,86 +30,90 @@
 float xMove[4], yMove[4], zMove[4];
 float alpha[4], beta[4], Gamma[4];
 
+//Function XHello[4];
+//Function YHello[4];
+//Function ZHello[4];
+
+//void setupHello(float h)
+//{
+//    XHello[0].addPoint(0.0, 90.0);
+//    XHello[0].addPoint(50.0, 65.0);
+//    XHello[0].addPoint(250.0, 65.0);
+//    XHello[0].addPoint(300.0, 90.0);
+
+//    XHello[1].addPoint(0.0, 90.0);
+//    XHello[1].addPoint(50.0, 90.0);
+//    XHello[1].addPoint(250.0, 90.0);
+//    XHello[1].addPoint(300.0, 90.0);
+
+//    XHello[2].addPoint(0.0, 90.0);
+//    XHello[2].addPoint(50.0, 90.0);
+//    XHello[2].addPoint(250.0, 90.0);
+//    XHello[2].addPoint(300.0, 90.0);
+
+//    XHello[3].addPoint(0.0, 90.0);
+//    XHello[3].addPoint(50.0, 90.0);
+//    XHello[3].addPoint(250.0, 90.0);
+//    XHello[3].addPoint(300.0, 90.0);
+
+//    YHello[0].addPoint(0.0, 0.0);
+//    YHello[0].addPoint(50.0, 0.0);
+//    YHello[0].addPoint(250.0, 0.0);
+//    YHello[0].addPoint(300.0, 0.0);
+
+//    YHello[1].addPoint(0.0, 0.0);
+//    YHello[1].addPoint(10.0, 10.0);
+//    YHello[1].addPoint(290.0, 10.0);
+//    YHello[1].addPoint(300.0, 0.0);
+
+//    YHello[2].addPoint(0.0, 0.0);
+//    YHello[2].addPoint(10.0, 0.0);
+//    YHello[2].addPoint(290.0, 0.0);
+//    YHello[2].addPoint(300.0, 0.0);
+
+//    YHello[3].addPoint(0.0, 0.0);
+//    YHello[3].addPoint(10.0, -10.0);
+//    YHello[3].addPoint(290.0, -10.0);
+//    YHello[3].addPoint(300.0, 0.0);
+
+//    ZHello[0].addPoint(0.0, h);
+//    ZHello[0].addPoint(50.0, h+175.0);
+//    ZHello[0].addPoint(250.0, h+175.0);
+//    ZHello[0].addPoint(300.0, h);
+
+//    ZHello[1].addPoint(0.0, h);
+//    ZHello[1].addPoint(50.0, h);
+//    ZHello[1].addPoint(250.0, h);
+//    ZHello[1].addPoint(300.0, h);
+
+//    ZHello[2].addPoint(0.0, h);
+//    ZHello[2].addPoint(50.0, h);
+//    ZHello[2].addPoint(250.0, h);
+//    ZHello[2].addPoint(300.0, h);
+
+//    ZHello[3].addPoint(0.0, h);
+//    ZHello[3].addPoint(50.0, h);
+//    ZHello[3].addPoint(250.0, h);
+//    ZHello[3].addPoint(300.0, h);
+//}
+
 bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
 {
     float a, b, c;
-//    Function X[4];
-//    Function Y[4];
-//    Function Z[4];
-//    if (t == 0) {
 
-//        X[0].addPoint(0.0, 90.0);
-//        X[0].addPoint(50.0, 65.0);
-//        X[0].addPoint(250.0, 65.0);
-//        X[0].addPoint(300.0, 90.0);
-
-//        X[1].addPoint(0.0, 90.0);
-//        X[1].addPoint(50.0, 90.0);
-//        X[1].addPoint(250.0, 90.0);
-//        X[1].addPoint(300.0, 90.0);
-
-//        X[2].addPoint(0.0, 90.0);
-//        X[2].addPoint(50.0, 90.0);
-//        X[2].addPoint(250.0, 90.0);
-//        X[2].addPoint(300.0, 90.0);
-
-//        X[3].addPoint(0.0, 90.0);
-//        X[3].addPoint(50.0, 90.0);
-//        X[3].addPoint(250.0, 90.0);
-//        X[3].addPoint(300.0, 90.0);
-
-
-//        Y[0].addPoint(0.0, 0.0);
-//        Y[0].addPoint(50.0, 0.0);
-//        Y[0].addPoint(250.0, 0.0);
-//        Y[0].addPoint(300.0, 0.0);
-
-//        Y[1].addPoint(0.0, 0.0);
-//        Y[1].addPoint(10.0, 10.0);
-//        Y[1].addPoint(290.0, 10.0);
-//        Y[1].addPoint(300.0, 0.0);
-
-//        Y[2].addPoint(0.0, 0.0);
-//        Y[2].addPoint(10.0, 0.0);
-//        Y[2].addPoint(290.0, 0.0);
-//        Y[2].addPoint(300.0, 0.0);
-
-//        Y[3].addPoint(0.0, 0.0);
-//        Y[3].addPoint(10.0, -10.0);
-//        Y[3].addPoint(290.0, -10.0);
-//        Y[3].addPoint(300.0, 0.0);
-
-//        Z[0].addPoint(0.0, h);
-//        Z[0].addPoint(50.0, h+175.0);
-//        Z[0].addPoint(250.0, h+175.0);
-//        Z[0].addPoint(300.0, h);
-
-//        Z[1].addPoint(0.0, h);
-//        Z[1].addPoint(50.0, h);
-//        Z[1].addPoint(250.0, h);
-//        Z[1].addPoint(300.0, h);
-
-//        Z[2].addPoint(0.0, h);
-//        Z[2].addPoint(50.0, h);
-//        Z[2].addPoint(250.0, h);
-//        Z[2].addPoint(300.0, h);
-
-//        Z[3].addPoint(0.0, h);
-//        Z[3].addPoint(50.0, h);
-//        Z[3].addPoint(250.0, h);
-//        Z[3].addPoint(300.0, h);
-//    }
+//    if (t < 1)
+//        setupHello(h);
 
     //Evolution du ouvement
     for (int i = 0; i < 4; i++)
     {
         // This is the x,y,z order in the referencial of the leg
-        if(t==0)
-        {
-            xMove[i] = 90.0;
-            yMove[i] = 0.0;
-            zMove[i] = h;
-        }
+        xMove[i] = 90.0;
+        yMove[i] = 0.0;
+        zMove[i] = h;
+//        xMove[i] = XHello[i].get(t);
+//        yMove[i] = YHello[i].get(t);
+//        zMove[i] = ZHello[i].get(t);
 
         switch (i) {
         case 0:
@@ -117,8 +121,8 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
             {
                 zMove[i] += 3.5;
                 xMove[i] -= 0.5;
-            }
-            else if (t<75)
+            } else
+            if (t<75)
             {
                 Gamma[i] = (t-50);
             }
@@ -145,19 +149,19 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
             }
             break;
         case 1:
-            if (t<50)
+            if (t<10)
                 yMove[i] += 1;
-            else if (t>250)
+            else if (t>290)
                 yMove[i] -= 1;
             Gamma[i] = 0;
             break;
         case 2:
-            break;
             Gamma[i] = 0;
+            break;
         case 3:
-            if (t<50)
+            if (t<10)
                 yMove[i] -= 1;
-            else if (t>250)
+            else if (t>290)
                 yMove[i] += 1;
             Gamma[i] = 0;
             break;
