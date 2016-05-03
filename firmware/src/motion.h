@@ -12,7 +12,6 @@ void motion_tick(float t);
 #define NO_MOVE 0
 #define HELLO_MOVE 1
 bool moves_tick(float t, int move);
-bool helloMove(float t);
 
 // Resets the motion
 void motion_reset();

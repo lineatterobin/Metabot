@@ -40,6 +40,23 @@ TERMINAL_COMMAND(rc, "Go to RC mode")
     isUSB = false;
 }
 
+TERMINAL_COMMAND(learning,
+        "Go to forward mode, the RC will be forwarded to USB and vice-versa. Usage: forward [baudrate]")
+{
+    terminal_io()->print("The learning mode will be enabled, ");
+    terminal_io()->println("you'll need to reboot the board to return to normal operation");
+    bool success;
+
+    while (1) {
+        for(int i=0; i<12; i++)
+        {
+            terminal_io()->print(i);
+            terminal_io()->print(" ");
+            terminal_io()->println(dxl_get_position(mapping[i], &success));
+        }
+    }
+}
+
 void setFlag()
 {
     flag = true;
@@ -122,11 +139,11 @@ void tick()
     }
 
 
-    if (moves_t < 9999)
+    if (specialMove != NO_MOVE)
     {
         if (moves_tick(moves_t, specialMove))
         {
-            moves_t = 9999;
+            moves_t = 0;
             specialMove = NO_MOVE;
         }
         else
