@@ -18,7 +18,7 @@ TERMINAL_PARAMETER_INT(color, "Robot's color", LED_R|LED_G|LED_B);
 TERMINAL_COMMAND(toggleColorfront, "Toggle colored front legs")
 {
     if(!leds_are_custom()) {
-        led_set(color, true);
+        led_set_all(color, true);
     }
     else {
         leds_decustom();

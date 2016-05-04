@@ -27,6 +27,7 @@
 #include "leds.h"
 #include "kinematic.h"
 
+float hOld;
 float xMove[4], yMove[4], zMove[4];
 float alpha[4], beta[4], Gamma[4];
 
@@ -100,7 +101,9 @@ float alpha[4], beta[4], Gamma[4];
 bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
 {
     float a, b, c;
-
+    if (t<1) {
+        hOld = h;
+    }
 //    if (t < 1)
 //        setupHello(h);
 
@@ -108,9 +111,11 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
     for (int i = 0; i < 4; i++)
     {
         // This is the x,y,z order in the referencial of the leg
-        xMove[i] = 90.0;
-        yMove[i] = 0.0;
-        zMove[i] = h;
+        if (t==0) {
+            xMove[i] = 90.0;
+            yMove[i] = 0.0;
+            zMove[i] = -55.0;
+        }
 //        xMove[i] = XHello[i].get(t);
 //        yMove[i] = YHello[i].get(t);
 //        zMove[i] = ZHello[i].get(t);
@@ -121,8 +126,8 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
             {
                 zMove[i] += 3.5;
                 xMove[i] -= 0.5;
-            } else
-            if (t<75)
+            }
+            else if (t<75)
             {
                 Gamma[i] = (t-50);
             }
@@ -175,8 +180,10 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
             led_set_all(LED_R, true);
         }
     }
-    if(t == 300)
+    if(t == 300) {
+        h = hOld;
         return true;
+    }
     else
         return false;
 }
