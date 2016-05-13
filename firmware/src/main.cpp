@@ -19,8 +19,6 @@
 #include "imu.h"
 #include "bt.h"
 
-bool isUSB = false;
-
 #define LIT     22
 
 bool flag = false;
@@ -49,7 +47,6 @@ TERMINAL_COMMAND(rc, "Go to RC mode")
     isUSB = false;
 }
 
-<<<<<<< HEAD
 TERMINAL_COMMAND(learning, "Go to learning mode")
 {
     terminal_io()->print("The learning mode will be enabled, ");
@@ -76,13 +73,6 @@ TERMINAL_COMMAND(learningStep, "Display motors value")
     }
 }
 
-void setFlag()
-{
-    flag = true;
-}
-
-=======
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
 // Enabling/disabling move
 TERMINAL_PARAMETER_BOOL(move, "Enable/Disable move", true);
 
@@ -93,7 +83,6 @@ TERMINAL_COMMAND(suicide, "Lit the fuse")
 }
 
 // Setting the flag, called @50hz
-bool flag = false;
 void setFlag()
 {
     flag = true;
@@ -111,11 +100,6 @@ TERMINAL_COMMAND(hello, "Enable Hello movement")
  */
 void setup()
 {
-<<<<<<< HEAD
-    RC.begin(921600);
-    terminal_init(&RC);
-
-=======
     // Initializing terminal on the RC port
     RC.begin(921600);
     terminal_init(&RC);
@@ -128,7 +112,6 @@ void setup()
     bt_init();
 
     // Initializing
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
     motion_init();
 
     // Initializing voltage measurement
@@ -155,11 +138,6 @@ void setup()
         l1[i] = l2[i] = l3[i] = 0;
     }
 
-<<<<<<< HEAD
-    // Enabling 50hz ticking
-    servos_init();
-    servos_attach_interrupt(setFlag);
-=======
     // Configuring board LED as output
     pinMode(BOARD_LED_PIN, OUTPUT);
     digitalWrite(BOARD_LED_PIN, LOW);
@@ -173,7 +151,6 @@ void setup()
     servos_attach_interrupt(setFlag);
     
     RC.begin(921600);
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
 }
 
 /**
@@ -207,13 +184,8 @@ void tick()
         }
         if (t < 0.0) t += 1.0;
 
-<<<<<<< HEAD
         motion_tick(t);
     }
-=======
-    motion_tick(t);
-
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
     // Sending order to servos
     dxl_set_position(mapping[0], l1[0]);
     dxl_set_position(mapping[3], l1[1]);
@@ -233,8 +205,6 @@ void tick()
 
 void loop()
 {
-<<<<<<< HEAD
-=======
     // Buzzer update
     buzzer_tick();
     // IMU ticking
@@ -242,7 +212,6 @@ void loop()
     // Sampling the voltage
     voltage_tick();
 
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
     // Updating the terminal
     terminal_tick();
 #if defined(RHOCK)
@@ -252,13 +221,10 @@ void loop()
         isUSB = true;
         terminal_init(&SerialUSB);
     }
-<<<<<<< HEAD
-=======
     if (!SerialUSB.getDTR() && isUSB) {
         isUSB = false;
         terminal_init(&RC);
     }
->>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
 
     // Calling user motion tick
     if (flag) {
