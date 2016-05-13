@@ -85,7 +85,8 @@ TERMINAL_PARAMETER_FLOAT(smoothBackLegs, "Smooth 180", 0.0);
 #define GAIT_WALK       0
 #define GAIT_TROT       1
 
-#define GAIT_MUSIC     2
+#define GAIT_MUSIC      2
+#define GAIT_MOVE       3
 
 TERMINAL_PARAMETER_INT(gait, "Gait (0:walk, 1:trot, 2:music)", GAIT_TROT);
 
@@ -108,6 +109,35 @@ TERMINAL_COMMAND(music, "change to gait music")
     h = -20;
     dx = 0;
     dy = 0;
+}
+TERMINAL_COMMAND(specialmove, "change to gait move")
+{
+    gait = GAIT_MOVE;
+    backLegs = 0;
+    crab = 0;
+    h = -55;
+    dx = 0;
+    dy = 0;
+}
+TERMINAL_COMMAND(motor1, "Set motor's values")
+{
+    if(gait == GAIT_MOVE) {
+        for(int i=0; i<2; i++) {
+            l1[i] = atof(argv[0+(i*3)]);
+            l2[i] = atof(argv[1+(i*3)]);
+            l3[i] = atof(argv[2+(i*3)]);
+        }
+    }
+}
+TERMINAL_COMMAND(motor2, "Set motor's values")
+{
+    if(gait == GAIT_MOVE) {
+        for(int i=2; i<4; i++) {
+            l1[i] = atof(argv[-6+(i*3)]);
+            l2[i] = atof(argv[-5+(i*3)]);
+            l3[i] = atof(argv[-4+(i*3)]);
+        }
+    }
 }
 TERMINAL_COMMAND(trot, "change to gait trot")
 {
@@ -296,6 +326,9 @@ void motion_tick(float t)
                 l2[i] = -signs[1]*(b + motion_music(2,i));
                 l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_music(3,i));
             }
+        }
+        else if(gait == GAIT_MOVE) {
+            ;;
         }
         else {
             if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {

@@ -40,8 +40,7 @@ TERMINAL_COMMAND(rc, "Go to RC mode")
     isUSB = false;
 }
 
-TERMINAL_COMMAND(learning,
-        "Go to forward mode, the RC will be forwarded to USB and vice-versa. Usage: forward [baudrate]")
+TERMINAL_COMMAND(learning, "Go to learning mode")
 {
     terminal_io()->print("The learning mode will be enabled, ");
     terminal_io()->println("you'll need to reboot the board to return to normal operation");
@@ -54,6 +53,16 @@ TERMINAL_COMMAND(learning,
             terminal_io()->print(" ");
             terminal_io()->println(dxl_get_position(mapping[i], &success));
         }
+    }
+}
+TERMINAL_COMMAND(learningStep, "Display motors value")
+{
+    bool success;
+    for(int i=0; i<12; i++)
+    {
+        terminal_io()->print(i);
+        terminal_io()->print(" ");
+        terminal_io()->println(dxl_get_position(mapping[i], &success));
     }
 }
 
