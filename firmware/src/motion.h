@@ -16,6 +16,9 @@ bool moves_tick(float t, int move);
 // Resets the motion
 void motion_reset();
 
+// Is the robot moving?
+bool motion_is_moving();
+
 // Sets parameters
 void motion_set_f(float f);
 void motion_set_h(float h);
@@ -25,6 +28,8 @@ void motion_set_y_speed(float y_speed);
 void motion_set_turn_speed(float turn_speed);
 
 // Add extra values
+void motion_extra_x(int index, float x);
+void motion_extra_y(int index, float y);
 void motion_extra_z(int index, float z);
 
 // Get values
