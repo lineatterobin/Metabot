@@ -138,3 +138,8 @@ TERMINAL_COMMAND(beep, "Plays a beep")
 {
     buzzer_beep(atoi(argv[0]), 1000);
 }
+
+TERMINAL_COMMAND(beepUntil, "Plays a beep until duration")
+{
+	buzzer_beep(atoi(argv[0]), atoi(argv[1]));
+}
