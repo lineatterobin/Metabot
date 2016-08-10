@@ -87,8 +87,9 @@ TERMINAL_PARAMETER_FLOAT(smoothBackLegs, "Smooth 180", 0.0);
 
 #define GAIT_MUSIC      2
 #define GAIT_MOVE       3
+#define GAIT_IMPRO      4
 
-TERMINAL_PARAMETER_INT(gait, "Gait (0:walk, 1:trot, 2:music)", GAIT_TROT);
+TERMINAL_PARAMETER_INT(gait, "Gait (0:walk, 1:trot, 2:music, 3:move, 4:impro)", GAIT_TROT);
 
 
 #ifdef HAS_TERMINAL
@@ -106,6 +107,13 @@ TERMINAL_COMMAND(toggleCrab, "Toggle crab mode")
 TERMINAL_COMMAND(music, "change to gait music")
 {
     gait = GAIT_MUSIC;
+    h = -20;
+    dx = 0;
+    dy = 0;
+}
+TERMINAL_COMMAND(impro, "change to gait impro")
+{
+    gait = GAIT_IMPRO;
     h = -20;
     dx = 0;
     dy = 0;
@@ -270,9 +278,10 @@ void motion_tick(float t)
         if (gait == GAIT_TROT) {
             legPhase = t + group*0.5;
         }
-        if (gait == GAIT_MUSIC) {
+        if (gait == GAIT_MUSIC || gait == GAIT_IMPRO) {
             legPhase = t;
         }
+
 
         float x, y, z, a, b, c;
 
@@ -314,6 +323,13 @@ void motion_tick(float t)
                 l1[i] = -signs[0]*(a + motion_music(1,i,freq));
                 l2[i] = -signs[1]*(b + motion_music(2,i,freq));
                 l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_music(3,i,freq));
+            }
+        }
+        else if(gait == GAIT_IMPRO) {
+            if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
+                l1[i] = -signs[0]*(a + motion_impro(1,i));
+                l2[i] = -signs[1]*(b + motion_impro(2,i));
+                l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_impro(3,i));
             }
         }
         else if(gait == GAIT_MOVE) {
