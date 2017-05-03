@@ -114,7 +114,7 @@ TERMINAL_COMMAND(music, "change to gait music")
 TERMINAL_COMMAND(impro, "change to gait impro")
 {
     gait = GAIT_IMPRO;
-    h = -20;
+    h = 0;
     dx = 0;
     dy = 0;
 }

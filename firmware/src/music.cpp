@@ -81,8 +81,8 @@ void setup_music_functions()
     glide.clear();
 
     perc.addPoint(0.0, 0.0);
-    perc.addPoint(0.1, 30.0);
-    perc.addPoint(0.3, 30.0);
+    perc.addPoint(0.1, -30.0);
+    perc.addPoint(0.3, -30.0);
     perc.addPoint(0.35, 0.0);
     perc.addPoint(1.0, 0.0);
 
