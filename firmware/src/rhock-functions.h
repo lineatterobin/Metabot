@@ -10,8 +10,11 @@ RHOCK_NATIVE_DECLARE(robot_control, 40);
 RHOCK_NATIVE_DECLARE(robot_h, 41);
 RHOCK_NATIVE_DECLARE(robot_f, 42);
 RHOCK_NATIVE_DECLARE(robot_r, 43);
-RHOCK_NATIVE_DECLARE(robot_ez, 44);
 RHOCK_NATIVE_DECLARE(robot_reset, 45);
+RHOCK_NATIVE_DECLARE(robot_ex, 46);
+RHOCK_NATIVE_DECLARE(robot_ey, 47);
+RHOCK_NATIVE_DECLARE(robot_ez, 44);
+RHOCK_NATIVE_DECLARE(robot_ea, 48);
 
 // Speed
 RHOCK_NATIVE_DECLARE(robot_stop, 50);
@@ -31,7 +34,15 @@ RHOCK_NATIVE_DECLARE(robot_move_y, 62);
 RHOCK_NATIVE_DECLARE(robot_beep, 55);
 
 // IMU
-RHOCK_NATIVE_DECLARE(robot_yaw, 57);
+RHOCK_NATIVE_DECLARE(robot_yaw, 33);
+RHOCK_NATIVE_DECLARE(robot_pitch, 34);
+RHOCK_NATIVE_DECLARE(robot_roll, 35);
+
+// Motors control
+RHOCK_NATIVE_DECLARE(robot_motor_start, 37);
+RHOCK_NATIVE_DECLARE(robot_motor_stop, 38);
+RHOCK_NATIVE_DECLARE(robot_motor_position, 39);
 
 // Controls
 RHOCK_NATIVE_DECLARE(robot_get_control, 58);
+

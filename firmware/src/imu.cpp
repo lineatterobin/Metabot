@@ -5,27 +5,31 @@
 #include "imu.h"
 #include "motion.h"
 
+static bool initialized = false;
+
 #define I2C_TIMEOUT 2
 
 int32 i2c_master_xfer_reinit(i2c_dev *dev,
         i2c_msg *msgs,
         uint16 num,
-        uint32 timeout) 
+        uint32 timeout)
 {
     int32 r = i2c_master_xfer(dev, msgs, num, timeout);
-    if (r != 0) {
-        i2c_init(I2C1);
-        i2c_master_enable(I2C1, I2C_FAST_MODE);
+    if (r != 0 || dev->state != I2C_STATE_IDLE) {
+        initialized = false;
     }
     return r;
 }
 
+static bool calibrated;
 static int last_update;
 float magn_x, magn_y, magn_z;
 float gyro_x, gyro_y, gyro_z;
 float acc_x, acc_y, acc_z;
 
 TERMINAL_PARAMETER_FLOAT(yaw, "Robot yaw", 0.0);
+TERMINAL_PARAMETER_FLOAT(pitch, "Robot pitch", 0.0);
+TERMINAL_PARAMETER_FLOAT(roll, "Robot roll", 0.0);
 TERMINAL_PARAMETER_FLOAT(gyro_yaw, "Robot gyro yaw", 0.0);
 
 TERMINAL_PARAMETER_BOOL(imudbg, "Debug the IMU", false);
@@ -88,10 +92,9 @@ static uint8 acc_req[] = {0x32};
 // Magnetometer packets
 static uint8 magn_continuous[] = {0x02, 0x00};
 static uint8 magn_50hz[] = {0x00, 0b00011000};
-static uint8 magn_sens[] = {0x01, 0b10000000};
+                        // Three highest bits are sensitivity
+static uint8 magn_sens[] = {0x01, 0b11100000};
 static uint8 magn_req[] = {0x03};
-
-static bool initialized = false;
 
 float normalize(float angle)
 {
@@ -111,7 +114,6 @@ float weight_average(float a1, float w1, float a2, float w2)
 
 void imu_init()
 {
-    bool error = false;
     yaw = 0.0;
     last_update = millis();
 
@@ -127,40 +129,40 @@ void imu_init()
     packet.flags = 0;
     packet.data = magn_continuous;
     packet.length = 2;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     packet.data = magn_50hz;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     packet.data = magn_sens;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     // Initializing accelerometer
     packet.addr = ACC_ADDR;
     packet.flags = 0;
     packet.data = acc_measure;
     packet.length = 2;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     packet.data = acc_resolution;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     packet.data = acc_50hz;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     // Initializing gyroscope
     packet.addr = GYRO_ADDR;
     packet.flags = 0;
     packet.data = gyro_reset;
     packet.length = 2;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     packet.data = gyro_scale;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
     packet.data = gyro_50hz;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
     packet.data = gyro_pll;
-    if (i2c_master_xfer_reinit(I2C1, &packet, 1, 100) != 0) goto init_error;
+    if (i2c_master_xfer_reinit(I2C1, &packet, 1, I2C_TIMEOUT) != 0) goto init_error;
 
     initialized = true;
     return;
@@ -216,11 +218,12 @@ void magn_update()
         magn_z = (magn_z_r-MAGN_Z_CENTER)/(float)MAGN_Z_AMP;
     }
 
-    if (calibrating) {
-    } else {
-        float new_yaw = atan2(magn_z, magn_x);
+    if (calibrated) {
+        float new_yaw = -atan2(magn_z, magn_x);
         float cur_yaw = DEG2RAD(yaw);
         yaw = RAD2DEG(weight_average(new_yaw, 0.01, cur_yaw, 0.99));
+    } else {
+        yaw = gyro_yaw;
     }
 }
 
@@ -247,10 +250,10 @@ void gyro_update()
     int gyro_z_r = ((buffer[4]&0xff)<<8)|(buffer[5]&0xff);
     gyro_z = GYRO_GAIN*VALUE_SIGN(gyro_z_r, 16);
 
-    yaw -= gyro_z * 0.02;
+    yaw += gyro_z * 0.02;
     yaw = normalize(yaw);
 
-    gyro_yaw -= gyro_z * 0.02;
+    gyro_yaw += gyro_z * 0.02;
     gyro_yaw = normalize(gyro_yaw);
 }
 
@@ -276,6 +279,12 @@ void acc_update()
     acc_y = VALUE_SIGN(acc_y_r, 16);
     int acc_z_r = ((buffer[5]&0xff)<<8)|(buffer[4]&0xff);
     acc_z = VALUE_SIGN(acc_z_r, 16);
+
+    float new_roll  = atan2(acc_x, acc_z);
+    float new_pitch = -atan2(acc_y, sqrt(acc_x*acc_x + acc_z*acc_z));
+
+    pitch = RAD2DEG(weight_average(new_pitch, 0.05, DEG2RAD(pitch), 0.95));
+    roll = RAD2DEG(weight_average(new_roll, 0.05, DEG2RAD(roll), 0.95));
 }
 
 void imu_tick()
@@ -286,9 +295,13 @@ void imu_tick()
     if (elapsed > 20) {
         last_update += 20;
 
-        gyro_update();
-        magn_update();
-        acc_update();
+        if (initialized) {
+            gyro_update();
+            magn_update();
+            acc_update();
+        } else {
+            imu_init();
+        }
 
         if (calibrating) {
             if (calibrating_t >= 0) {
@@ -326,7 +339,7 @@ void imu_tick()
             terminal_io()->print(" ");
 
             terminal_io()->print(yaw);
-            terminal_io()->print(" ");    
+            terminal_io()->print(" ");
 
             terminal_io()->println();
         }
@@ -373,6 +386,7 @@ void imu_calib_start()
 
 void imu_calib_stop()
 {
+    calibrated = true;
     calibrating = false;
 }
 
@@ -386,6 +400,16 @@ void imu_calib_rotate()
 float imu_yaw()
 {
     return yaw;
+}
+
+float imu_pitch()
+{
+    return pitch;
+}
+
+float imu_roll()
+{
+    return roll;
 }
 
 TERMINAL_COMMAND(calibrot, "Calibrating rotation")

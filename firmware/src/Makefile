@@ -91,19 +91,12 @@ LIBMAPLE_MODULES += $(LIBMAPLE_MODULE_SERIES) # STM32 series submodule in libmap
 LIBMAPLE_MODULES += $(SRCROOT)/wirish
 
 # Official libraries:
-#<<<<<<< HEAD
-#LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
-#LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
-#LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
-# Experimental libraries:
-#LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
-#=======
+
 #LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
 #LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
 #LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
 # Experimental libraries:
 # LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
-#>>>>>>> b806faa67ebbe3d692cb0bd5b299f14198537a0f
 
 # User modules:
 ifneq ($(USER_MODULES),)

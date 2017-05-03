@@ -28,6 +28,7 @@ TERMINAL_COMMAND(toggleColorfront, "Toggle colored front legs")
 /**
  * Colorizes the robot
  */
+
 void colorize()
 {
     if (!leds_are_custom()) {
@@ -43,10 +44,6 @@ void colorize()
     }
 }
 
-/**
- * Changes the mapping of the leg, the input is the direction
- * (between 0 and 3)
- */
 void remap(int direction)
 {
     currentMapping = direction;

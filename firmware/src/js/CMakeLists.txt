@@ -16,10 +16,12 @@ set (SOURCES
     ${BASE}/kinematic.cpp
     ${BASE}/motion.cpp
     ${BASE}/leds.cpp
+    ${BASE}/buzzer.cpp
     ${BASE}/motors.cpp
     ${BASE}/mapping.cpp
     ${BASE}/rhock-functions.cpp
     ${BASE}/rhock-stream.cpp
+    ${BASE}/cubic.cpp
     ${RH_BASE}/function.cpp
     )
 
