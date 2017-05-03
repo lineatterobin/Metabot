@@ -31,7 +31,6 @@ TERMINAL_PARAMETER_FLOAT(freqLeg4, "Leg 4's freq", 0.0);
 
 #define MODE_PERC       0
 #define MODE_GLIDE      1
-#define MODE_SCRATCH    2
 
 TERMINAL_PARAMETER_INT(modeLeg1, "Mode (0:Perc, 1:GLIDE, 2:SCRATCH)", MODE_PERC);
 TERMINAL_PARAMETER_INT(modeLeg2, "Mode (0:Perc, 1:GLIDE, 2:SCRATCH)", MODE_PERC);
@@ -42,7 +41,6 @@ TERMINAL_PARAMETER_FLOAT(phaseLeg1, "Leg 1's phase", 0.0);
 TERMINAL_PARAMETER_FLOAT(phaseLeg2, "Leg 2's phase", 0.0);
 TERMINAL_PARAMETER_FLOAT(phaseLeg3, "Leg 3's phase", 0.0);
 TERMINAL_PARAMETER_FLOAT(phaseLeg4, "Leg 4's phase", 0.0);
-
 
 TERMINAL_COMMAND(freqLegs, "Set all freqLeg") {
     if (argc > 0) {
@@ -59,6 +57,21 @@ TERMINAL_COMMAND(freqLegs, "Set all freqLeg") {
     }
 }
 
+float Lg[4] = {0.0,0.0,0.0,0.0};
+
+TERMINAL_COMMAND(Leg1, "Execute a single movement with the leg 1.") {
+    Lg[0] = 0.0;
+}
+TERMINAL_COMMAND(Leg2, "Execute a single movement with the leg 2.") {
+    Lg[1] = 0.0;
+}
+TERMINAL_COMMAND(Leg3, "Execute a single movement with the leg 3.") {
+    Lg[2] = 0.0;
+}
+TERMINAL_COMMAND(Leg4, "Execute a single movement with the leg 4.") {
+    Lg[3] = 0.0;
+}
+
 Function perc;
 Function glide;
 
@@ -68,8 +81,13 @@ void setup_music_functions()
     glide.clear();
 
     perc.addPoint(0.0, 0.0);
+<<<<<<< HEAD
     perc.addPoint(0.1, 30.0);
     perc.addPoint(0.3, 30.0);
+=======
+    perc.addPoint(0.1, -30.0);
+    perc.addPoint(0.3, -30.0);
+>>>>>>> v2
     perc.addPoint(0.35, 0.0);
     perc.addPoint(1.0, 0.0);
 
@@ -85,9 +103,7 @@ void setup_music_functions()
 float tps = 0;
 
 float motion_music(int motor, int leg, float freq) {
-
     setup_music_functions();
-
     float freqLeg;
     float phase;
     int mode;
@@ -140,91 +156,64 @@ float motion_music(int motor, int leg, float freq) {
         else
             return 0.0;
         break;
-    case MODE_SCRATCH:
-        return calc_angle_scratch(motor, freq, phase);
-        break;
-    default:
-        return 0.0;
-        break;
-    }
-
-
-}
-
-//OBSOLETE
-//Mode Perc calculation
-//float calc_angle_perc(int motor, float freq, float phase) {
-//    float time;
-//    switch(motor) {
-//    case 1:
-//        return 0.0;
-//        break;
-//    case 2:
-//        time = fmod((freq*tps)/(TMAX*1.0),1)*3.14;
-//        time += phase*3.14;
-//        return (abs(sin(time))-abs(cos(time-3.14/2.5))+0.3)*30.0;
-//        break;
-//    case 3:
-//        return 0.0;
-//        break;
-//    default:
-//        return 0.0;
-//        break;
-//    }
-//}
-
-//Mode Glide calculation
-//float calc_angle_glide(int motor, float freq, float phase) {
-//    float time;
-//    switch(motor) {
-//    case 1:
-//        return 0.0;
-//        break;
-//    case 2:
-//        time = fmod((freq*tps)/(TMAX*1.0),1)*3.14;
-//        time += phase*3.14;
-//        return ((abs(cos(time)))-1)*50.0;
-//        break;
-//    case 3:
-//        time = fmod((freq*tps)/(TMAX*1.0),1)*3.14;
-//        time += phase*3.14;
-//        return ((abs(cos(time)))-1)*50.0;
-//        break;
-//    default:
-//        return 0.0;
-//        break;
-//    }
-//}
-
-//Mode Scratch calculation
-float calc_angle_scratch(int motor, float freq, float phase) {
-    float time;
-    float result;
-    switch(motor) {
-    case 1:
-        return 0.0;
-        break;
-    case 2:
-        time = fmod((freq*tps)/(TMAX*1.0),1)*3.14;
-        time += phase*3.14;
-        result = (sin(time)-1);
-        if(result > -1)
-            return result*50.0;
-        else
-            return 0.0;
-        break;
-    case 3:
-        time = fmod((freq*tps)/(TMAX*1.0),1)*3.14;
-        time += phase*3.14;
-        result = (sin(time)-1);
-        if(result > -1)
-            return result*50.0;
-        else
-            return 0.0;
-        break;
     default:
         return 0.0;
         break;
     }
 }
 
+float motion_impro(int motor, int leg) {
+
+    if (Lg[leg] <= 1.0) {
+        setup_music_functions();
+
+        int mode;
+
+        switch(leg) {
+        case 0:
+            mode = modeLeg1;
+            break;
+        case 1:
+            mode = modeLeg2;
+            break;
+        case 2:
+            mode = modeLeg3;
+            break;
+        case 3:
+            mode = modeLeg4;
+            break;
+        default:
+            mode = MODE_PERC;
+            break;
+        }
+
+        float res = 0;
+
+        switch(mode) { //Add more modes in this switch
+        case MODE_PERC:
+            if (motor==2)
+                return perc.getMod(Lg[leg]);
+            else if (motor==3) {
+                Lg[leg] = Lg[leg] + 0.1;
+                return 0.0;
+            }
+            else
+                return 0.0;
+            break;
+        case MODE_GLIDE:
+            if (motor==2)
+                return glide.getMod(Lg[leg]);
+            else if (motor==3) {
+                res = glide.getMod(Lg[leg]);
+                Lg[leg] = Lg[leg] + 0.1;
+                return res;
+            }
+            else
+                return 0.0;
+            break;
+        default:
+            return 0.0;
+            break;
+        }
+    }
+}

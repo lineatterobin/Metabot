@@ -9,10 +9,17 @@
 #include <rc.h>
 #include <rhock.h>
 #include <servos.h>
+#include "voltage.h"
+#include "buzzer.h"
+#include "distance.h"
 #include "config.h"
 #include "motion.h"
 #include "leds.h"
 #include "mapping.h"
+#include "imu.h"
+#include "bt.h"
+
+#define LIT     22
 
 bool flag = false;
 bool isUSB = false;
@@ -66,16 +73,20 @@ TERMINAL_COMMAND(learningStep, "Display motors value")
     }
 }
 
+// Enabling/disabling move
+TERMINAL_PARAMETER_BOOL(move, "Enable/Disable move", true);
+
+
+TERMINAL_COMMAND(suicide, "Lit the fuse")
+{
+    digitalWrite(LIT, HIGH);
+}
+
+// Setting the flag, called @50hz
 void setFlag()
 {
     flag = true;
 }
-
-// Enabling/disabling move
-TERMINAL_PARAMETER_BOOL(move, "Enable/Disable move", true);
-
-// Average voltage
-TERMINAL_PARAMETER_INT(voltage, "Average voltage (dV)", 75);
 
 int specialMove = NO_MOVE;
 TERMINAL_COMMAND(hello, "Enable Hello movement")
@@ -89,10 +100,22 @@ TERMINAL_COMMAND(hello, "Enable Hello movement")
  */
 void setup()
 {
+    // Initializing terminal on the RC port
     RC.begin(921600);
     terminal_init(&RC);
 
+    // Lit pin is output low
+    digitalWrite(LIT, LOW);
+    pinMode(LIT, OUTPUT);
+
+    // Initializing bluetooth module
+    bt_init();
+
+    // Initializing
     motion_init();
+
+    // Initializing voltage measurement
+    voltage_init();
 
     // Initializing the DXL bus
     delay(500);
@@ -101,17 +124,33 @@ void setup()
     // Initializing config (see config.h)
     config_init();
 
+    // initializing distance
+    distance_init();
+
+    // Initializing the IMU
+    imu_init();
+
     // Initializing positions to 0
     for (int i=0; i<12; i++) {
-        dxl_set_position(servos_order[i], 0.0);
+        dxl_set_position(i+1, 0.0);
     }
     for (int i=0; i<4; i++) {
         l1[i] = l2[i] = l3[i] = 0;
     }
 
-    // Enabling 50hz ticking
+    // Configuring board LED as output
+    pinMode(BOARD_LED_PIN, OUTPUT);
+    digitalWrite(BOARD_LED_PIN, LOW);
+
+    // Initializing the buzzer, and playing the start-up melody
+    buzzer_init();
+    buzzer_play(MELODY_BOOT);
+
+    // Enable 50hz ticking
     servos_init();
     servos_attach_interrupt(setFlag);
+    
+    RC.begin(921600);
 }
 
 /**
@@ -119,29 +158,6 @@ void setup()
  */
 void tick()
 {
-    // Computing average voltage
-    static int idToRead = 0;
-    static int blink;
-
-    idToRead++;
-    if (idToRead >= 12) idToRead = 0;
-    bool success;
-    int voltageOnce = dxl_read_byte(idToRead+1, DXL_VOLTAGE, &success);
-    if (success) {
-        if (voltageOnce < voltage) voltage--;
-        if (voltageOnce > voltage) voltage++;
-    }
-
-    if (voltage < 60) {
-        dxl_write_word(DXL_BROADCAST, DXL_GOAL_TORQUE, 0);
-        blink++;
-        if (blink > 10) {
-            blink = 0;
-        }
-        dxl_write_byte(DXL_BROADCAST, DXL_LED, blink<5);
-        return;
-    }
-
     if (!move || !started) {
         t = 0.0;
         return;
@@ -189,6 +205,13 @@ void tick()
 
 void loop()
 {
+    // Buzzer update
+    buzzer_tick();
+    // IMU ticking
+    imu_tick();
+    // Sampling the voltage
+    voltage_tick();
+
     // Updating the terminal
     terminal_tick();
 #if defined(RHOCK)
@@ -197,6 +220,10 @@ void loop()
     if (SerialUSB.available() && !isUSB) {
         isUSB = true;
         terminal_init(&SerialUSB);
+    }
+    if (!SerialUSB.getDTR() && isUSB) {
+        isUSB = false;
+        terminal_init(&RC);
     }
 
     // Calling user motion tick
