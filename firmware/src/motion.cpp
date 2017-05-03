@@ -332,16 +332,16 @@ void motion_tick(float t)
         // Computing inverse kinematics
         if(gait == GAIT_MUSIC) {
             if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
-                l1[i] = -signs[0]*(a + motion_music(1,i,freq));
-                l2[i] = -signs[1]*(b + motion_music(2,i,freq));
-                l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_music(3,i,freq));
+                l1[i] = -SIGN_A*(a + motion_music(1,i,freq));
+                l2[i] = -SIGN_B*(b + motion_music(2,i,freq));
+                l3[i] = -SIGN_C*((c - 180*smoothBackLegs) + motion_music(3,i,freq));
             }
         }
         else if(gait == GAIT_IMPRO) {
             if (computeIK(x, y, z, &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
-                l1[i] = -signs[0]*(a + motion_impro(1,i));
-                l2[i] = -signs[1]*(b + motion_impro(2,i));
-                l3[i] = -signs[2]*((c - 180*smoothBackLegs) + motion_impro(3,i));
+                l1[i] = -SIGN_A*(a + motion_impro(1,i));
+                l2[i] = -SIGN_B*(b + motion_impro(2,i));
+                l3[i] = -SIGN_C*((c - 180*smoothBackLegs) + motion_impro(3,i));
             }
         }
         else if(gait == GAIT_MOVE) {

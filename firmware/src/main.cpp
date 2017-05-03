@@ -83,7 +83,9 @@ TERMINAL_COMMAND(suicide, "Lit the fuse")
 }
 */
 
+
 // Setting the flag, called @50hz
+bool flag = false;
 void setFlag()
 {
     flag = true;
