@@ -28,14 +28,14 @@ class XBoxController():
 		B_TL = 0
 		B_THL = 0
 		B_THR = 0
+		B_MODE = 0
 
 		events = old_events
 
 		for event in new_events:
 			if event.ev_type != "Sync" :
 				if event.code == "BTN_MODE" and event.state == 1:
-					#self.quit_attempt = event.state
-					pass
+					B_MODE = event.state
 				elif event.code == "ABS_RY":
 					if abs(event.state - absRY) > 500:
 						absRY = event.state
@@ -77,14 +77,14 @@ class XBoxController():
 					self.quit_attempt = event.state
 				elif event.code == "BTN_THUMBR":
 					B_THR = event.state
-				events = (absY, absX, absRY, absRX, absZ, absRZ, absHY, absHX, B_E, B_W, B_N, B_S, B_ST, B_SEL, B_TR, B_TL, B_THL, B_THR)
+				events = (absY, absX, absRY, absRX, absZ, absRZ, absHY, absHX, B_E, B_W, B_N, B_S, B_ST, B_SEL, B_TR, B_TL, B_THL, B_THR, B_MODE)
 		return events
 
 if __name__ == '__main__':
 	if(len(sys.argv)) == 2:
 		ihm = IHMetabot(sys.argv[1])
 		xboxc = XBoxController()
-		old_events = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		old_events = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 		old_orders = []
 		while(not xboxc.quit_attempt):
 			new_events = xboxc.get_events(old_events)

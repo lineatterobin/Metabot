@@ -7,6 +7,7 @@ class IHMetabot():
 	"""Interface controller with metabot """
 	def __init__(self,rfcomm):
 		self.metabot = MetabotV2(rfcomm)
+		print("Connected")
 
 	def handle_events(self,events):
 		#Format controller output
@@ -19,16 +20,17 @@ class IHMetabot():
 		absRZ = events[5]
 		absHY = events[6]
 		absHX = events[7]
-		B_E = events[8]
-		B_W = events[9]
-		B_N = events[10]
-		B_S = events[11]
+		B_S = events[8]
+		B_N = events[9]
+		B_W = events[10]
+		B_E = events[11]
 		B_ST = events[12]
 		B_SEL = events[13]
 		B_TR = events[14]
 		B_TL = events[15]
 		B_THL = events[16]
 		B_THR = events[17]
+		B_MODE = events[18]
 
 		dx = (absY//2000)*5
 		dy = (absX//2000)*5
@@ -41,6 +43,20 @@ class IHMetabot():
 		elif B_ST == 1 and self.metabot.started:
 			self.metabot.stop()
 			time.sleep(1)
+
+		if B_MODE == 1 and self.metabot.mode == "trot":
+			self.metabot.chmode("music")
+			time.sleep(1)
+		elif B_MODE == 1 and self.metabot.mode == "music":
+			self.metabot.chmode("trot")
+			time.sleep(1)
+
+		if B_W == 1:
+			self.metabot.crabVal = 30 - self.metabot.crabVal
+			orders.append(("crab",self.metabot.crabVal))
+
+		if B_N == 1:
+			self.metabot.control(("toggleBackLegs", B_N))
 
 		if absHX == -1:
 			mid = random.randint(300,800)
@@ -70,4 +86,5 @@ class IHMetabot():
 				self.metabot.control(new_order)
 		
 	def leave(self):
+		self.metabot.chmode("trot")
 		self.metabot.stop()

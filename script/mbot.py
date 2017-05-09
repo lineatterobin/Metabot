@@ -4,6 +4,8 @@ class MetabotV2():
 	def __init__(self, rfcomm):
 		self.serial = serial.Serial(port=rfcomm, baudrate=115200)
 		self.started = False
+		self.mode = "trot"
+		self.crabVal = 0
 
 	def start(self):
 		print("Start")
@@ -23,7 +25,7 @@ class MetabotV2():
 		return value
 
 	def control(self,order):
-		value = str(order[1])
+		value = str(self.check(order[0],order[1]))
 		for i in range(2,len(order)):
 			val = self.check(order[0],order[i])
 			value = value + " " + str(val)
@@ -36,3 +38,9 @@ class MetabotV2():
 		self.serial.write('stop\n\r'.encode('utf-8'))
 		self.serial.flushInput()
 		self.started = False
+
+	def chmode(self,mode):
+		print("Mode " + mode)
+		self.mode = mode
+		self.serial.write(('{}\n\r'.format(mode)).encode('utf-8'))
+		self.serial.flushInput()
