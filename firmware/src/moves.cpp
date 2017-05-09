@@ -175,9 +175,9 @@ bool helloMove(float t, float h, bool backLegs, float smoothBackLegs)
             break;
         }
         if (computeIK(xMove[i], yMove[i], zMove[i], &a, &b, &c, L1, L2, backLegs ? L3_2 : L3_1)) {
-            l1[i] = -signs[0]*a + alpha[i];
-            l2[i] = -signs[1]*b + beta[i];
-            l3[i] = -signs[2]*(c - 180*smoothBackLegs) + Gamma[i];
+            l1[i] = -SIGN_A*a + alpha[i];
+            l2[i] = -SIGN_B*b + beta[i];
+            l3[i] = -SIGN_C*(c - 180*smoothBackLegs) + Gamma[i];
         }
         else {
             led_set_all(LED_R, true);
