@@ -1,0 +1,188 @@
+help:
+        Displays the help about commands
+params:
+        Displays the available parameters. Usage: params [show]
+echo:
+        Switch echo mode. Usage echo [on|off]
+mute:
+        Mute/Unmute the terminal
+forward:
+        Go to forward mode, the RC will be forwarded to USB and vice-versa. Usage: forward [baudrate]
+start:
+        Enable all the servos
+stop:
+        Disable all servos
+dxl_scan:
+        Scans for dynamixel servos
+dxl_monitor:
+        Monitors servos
+dxl_release:
+        Releases all the dynamixel servos
+dxl_id:
+        Identify a servo
+dxl_setbaud:
+        Sets the correct baudrate
+dxl_init:
+        Initializes the dynamixel system
+dxl_enable:
+        Enable a dxl servo
+dxl_disable:
+        DIsable a dxl servo
+dxl_position:
+        Go to a given position
+dxl_ping:
+        Pings a dynamixel servo
+dxl_zero:
+        Sets the current position as zero
+dxl_calibrate:
+        Calibrates a dynamixel servo
+dxl_dump:
+        Dumps the dynamixel config
+dxl_snapshot:
+        Snapshots the current position
+dxl_voltage:
+        Prints the dynamixel average voltage
+dxl_p:
+        Sets the P of the PIDs
+dxl_compliance:
+        Sets the compliance slope
+dxl_margin:
+        Sets the compliance margin
+dxl_configure:
+        Configures a servo
+dxl_forward:
+        Dynamixel forward mode
+version:
+        Getting firmware version
+started:
+        Is the robot started?
+rc:
+        Go to RC mode
+learning:
+        Go to learning mode
+learningStep:
+        Display motors value
+hello:
+        Enable Hello movement
+toggleBackLegs:
+        Toggle back legs
+toggleCrab:
+        Toggle crab mode
+music:
+        change to gait music
+impro:
+        change to gait impro
+specialmove:
+        change to gait move
+motor1:
+        Set motor's values
+motor2:
+        Set motor's values
+trot:
+        change to gait trot
+support:
+        Setup functions
+toggleColorfront:
+        Toggle colored front legs
+remap:
+        Changes the mapping
+play:
+        Play a melody
+beep:
+        Plays a beep
+beepUntil:
+        Plays a beep until duration
+calib:
+        Calibrates the IMU
+calibrot:
+        Calibrating rotation
+dist:
+        Monitor distances
+voltage:
+        Get the voltage
+btconf:
+        Bluetooth config
+btpulse:
+        BT conf pulse
+freqLegs:
+        Set all freqLeg
+Leg1:
+        Execute a single movement with the leg 1.
+Leg2:
+        Execute a single movement with the leg 2.
+Leg3:
+        Execute a single movement with the leg 3.
+Leg4:
+        Execute a single movement with the leg 4.
+
+
+
+
+prescaler:
+         Prescaler (int)
+t:
+        Time (float)
+moves_t:
+        Time for special moves (float)
+move:
+        Enable/Disable move (bool)
+freq:
+        Time factor gain (float)
+backLegs:
+        Legs backwards (bool)
+alt:
+        Height of the steps (float)
+r:
+        Robot size (float)
+h:
+        Robot height (float)
+dx:
+        Dx (float)
+dy:
+        Dy (float)
+turn:
+        Turn (float)
+crab:
+        Crab (float)
+frontH:
+        Front delta H (float)
+smoothBackLegs:
+        Smooth 180 (float)
+gait:
+        Gait (1:trot, 2:music, 3:move, 4:impro) (float)
+color:
+        Robot's color (int)
+yaw:
+        Robot yaw (float)
+pitch:
+        Robot pitch (float)
+roll:
+        Robot roll (float)
+gyro_yaw:
+        Robot gyro yaw (float)
+imudbg:
+        Debug the IMU (bool)
+freqLeg1:
+        Leg 1's freq (float)
+freqLeg2:
+        Leg 2's freq (float)
+freqLeg3:
+        Leg 3's freq (float)
+freqLeg4:
+        Leg 4's freq (float)
+modeLeg1:
+        Mode (0:Perc, 1:GLIDE, 2:SCRATCH) (int)
+modeLeg2:
+        Mode (0:Perc, 1:GLIDE, 2:SCRATCH) (int)
+modeLeg3:
+        Mode (0:Perc, 1:GLIDE, 2:SCRATCH) (int)
+modeLeg4:
+        Mode (0:Perc, 1:GLIDE, 2:SCRATCH) (int)
+phaseLeg1:
+        Leg 1's phase (float)
+phaseLeg2:
+        Leg 2's phase (float)
+phaseLeg3:
+        Leg 3's phase (float)
+phaseLeg4:
+        Leg 4's phase (float)
