@@ -14,6 +14,8 @@
 #define MELODY_BEGIN      4
 // A custom melody used by beep
 #define MELODY_CUSTOM     5
+// Custom boot melody to know if our firmware is in the bot
+#define MELODY_BOOSTOM    6
 
 /**
  * Initializes the buzzer

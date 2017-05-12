@@ -71,6 +71,17 @@ static struct buzzer_note melody_custom[] = {
     {0, 0}
 };
 
+static struct buzzer_note melody_boostom[] = {
+    {220, 500},
+    {330, 300},
+    {440, 250},
+    {550, 225},
+    {660, 200},
+    {770, 150},
+    {880, 100},
+    {0, 0}
+};
+
 // Status
 static struct buzzer_note *melody;
 static struct buzzer_note *melody_repeat;
@@ -157,6 +168,8 @@ void buzzer_play(unsigned int melody_num, bool repeat)
         to_play = &melody_begin[0];
     } else if (melody_num == MELODY_CUSTOM) {
         to_play = &melody_custom[0];
+    } else if (melody_num == MELODY_BOOSTOM) {
+        to_play = &melody_boostom[0];
     } else {
         melody = NULL;
     }
