@@ -58,6 +58,9 @@ class IHMetabot():
 		if B_N == 1:
 			self.metabot.control(("toggleBackLegs", B_N))
 
+		if B_E == 1:
+			self.metabot.control(("hello", 0))
+
 		if absHX == -1:
 			mid = random.randint(300,800)
 			orders.append(("beepUntil", mid, 15000))
