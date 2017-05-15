@@ -9,7 +9,7 @@ class MetabotV2():
 
 	def start(self):
 		print("Start")
-		self.serial.write('start\n\r'.encode('utf-8'))
+		self.serial.write('start\r'.encode('utf-8'))
 		self.serial.flushInput()
 		self.started = True
 
@@ -30,17 +30,17 @@ class MetabotV2():
 			val = self.check(order[0],order[i])
 			value = value + " " + str(val)
 		print((order[0],value))
-		self.serial.write(('{} {}\n\r'.format(order[0],value)).encode('utf-8'))
+		self.serial.write(('{} {}\r'.format(order[0],value)).encode('utf-8'))
 		self.serial.flushInput()
 		
 	def stop(self):
 		print("Stop")
-		self.serial.write('stop\n\r'.encode('utf-8'))
+		self.serial.write('stop\r'.encode('utf-8'))
 		self.serial.flushInput()
 		self.started = False
 
 	def chmode(self,mode):
 		print("Mode " + mode)
 		self.mode = mode
-		self.serial.write(('{}\n\r'.format(mode)).encode('utf-8'))
+		self.serial.write(('{}\r'.format(mode)).encode('utf-8'))
 		self.serial.flushInput()

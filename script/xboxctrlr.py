@@ -88,7 +88,7 @@ if __name__ == '__main__':
 		old_orders = []
 		while(not xboxc.quit_attempt):
 			new_events = xboxc.get_events(old_events)
-			new_orders = ihm.handle_events(new_events)
+			new_orders = ihm.handle_events(new_events,ihm.metabot.mode)
 			old_events = new_events
 			ihm.send_orders(new_orders,old_orders)
 			old_orders = new_orders

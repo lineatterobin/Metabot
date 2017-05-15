@@ -7,9 +7,10 @@ class IHMetabot():
 	"""Interface controller with metabot """
 	def __init__(self,rfcomm):
 		self.metabot = MetabotV2(rfcomm)
+		self.even = True
 		print("Connected")
 
-	def handle_events(self,events):
+	def handle_events(self,events,mode):
 		#Format controller output
 		orders = []
 		absY = events[0]
@@ -44,19 +45,29 @@ class IHMetabot():
 			self.metabot.stop()
 			time.sleep(1)
 
-		if B_MODE == 1 and self.metabot.mode == "trot":
-			self.metabot.chmode("music")
+		if B_MODE == 1 and mode == "trot":
+			self.metabot.chmode("impro")
 			time.sleep(1)
-		elif B_MODE == 1 and self.metabot.mode == "music":
+		elif B_MODE == 1 and mode == "impro":
 			self.metabot.chmode("trot")
 			time.sleep(1)
 
-		if B_W == 1:
+		if B_W == 1 and mode == "trot":
 			self.metabot.crabVal = 30 - self.metabot.crabVal
 			orders.append(("crab",self.metabot.crabVal))
+		elif B_W == 1 and mode == "impro":
+			self.metabot.control(("Leg4",0))
 
-		if B_N == 1:
-			self.metabot.control(("toggleBackLegs", B_N))
+		if B_N == 1 and mode == "trot":
+			self.metabot.control(("toggleBackLegs", 0))
+		elif B_N == 1 and mode == "impro":
+			self.metabot.control(("Leg1",0))
+
+		if B_E == 1 and mode == "impro":
+			self.metabot.control(("Leg4",0))
+
+		if B_S == 1 and mode == "impro":
+			self.metabot.control(("Leg3",0))
 
 		if absHX == -1:
 			mid = random.randint(300,800)
@@ -70,9 +81,11 @@ class IHMetabot():
 		elif absHX == 1:
 			orders.append(("beepUntil",42,0))
 
-		orders.append(("dx", dx))
-		orders.append(("dy", dy))
-		orders.append(("turn",turn))
+		if mode == "trot":
+			orders.append(("dx", dx))
+			orders.append(("dy", dy))
+			orders.append(("turn",turn))
+
 		orders.append(("freq",freq))
 		return orders
 
