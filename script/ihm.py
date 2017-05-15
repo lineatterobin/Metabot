@@ -69,6 +69,9 @@ class IHMetabot():
 		if B_S == 1 and mode == "impro":
 			self.metabot.control(("Leg3",0))
 
+		if B_E == 1:
+			self.metabot.control(("hello", 0))
+
 		if absHX == -1:
 			mid = random.randint(300,800)
 			orders.append(("beepUntil", mid, 15000))

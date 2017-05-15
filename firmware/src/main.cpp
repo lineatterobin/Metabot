@@ -163,7 +163,7 @@ void setup()
 
     // Initializing the buzzer, and playing the start-up melody
     buzzer_init();
-    buzzer_play(MELODY_BOOT);
+    buzzer_play(MELODY_BOOSTOM);
 
     // Enable 50hz ticking
     servos_init();
