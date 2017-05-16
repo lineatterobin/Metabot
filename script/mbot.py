@@ -1,11 +1,14 @@
 import serial
+import time
 
 class MetabotV2():
 	def __init__(self, rfcomm):
 		self.serial = serial.Serial(port=rfcomm, baudrate=115200)
 		self.started = False
 		self.mode = "trot"
+		self.h = -55
 		self.crabVal = 0
+		self.l4 = False
 
 	def start(self):
 		print("Start")
@@ -22,6 +25,9 @@ class MetabotV2():
 			value = 0 if abs(value) < 10 else value
 		elif command == "turn":
 			value = 0 if abs(value) < 6 else value
+		elif command == "h":
+			value = 0 if value > 0 else (-130 if value < -130 else value)
+			self.h = value
 		return value
 
 	def control(self,order):

@@ -10,7 +10,7 @@ class IHMetabot():
 		self.even = True
 		print("Connected")
 
-	def handle_events(self,events,mode):
+	def handle_events(self,events):
 		#Format controller output
 		orders = []
 		absY = events[0]
@@ -22,8 +22,8 @@ class IHMetabot():
 		absHY = events[6]
 		absHX = events[7]
 		B_S = events[8]
-		B_N = events[9]
-		B_W = events[10]
+		B_N = events[10]
+		B_W = events[9]
 		B_E = events[11]
 		B_ST = events[12]
 		B_SEL = events[13]
@@ -35,6 +35,7 @@ class IHMetabot():
 
 		dx = (absY//2000)*5
 		dy = (absX//2000)*5
+		dh = (B_TL*8 + B_TR*-8) if (B_TL + B_TR != 0) else 0 #Down if LR pressed Up if RR pressed
 		turn = (absRX//2000)*2.5
 		freq = absRZ/100
 
@@ -45,32 +46,29 @@ class IHMetabot():
 			self.metabot.stop()
 			time.sleep(1)
 
-		if B_MODE == 1 and mode == "trot":
+		if B_MODE == 1 and self.metabot.mode == "trot":
 			self.metabot.chmode("impro")
 			time.sleep(1)
-		elif B_MODE == 1 and mode == "impro":
+		elif B_MODE == 1 and self.metabot.mode == "impro":
 			self.metabot.chmode("trot")
 			time.sleep(1)
 
-		if B_W == 1 and mode == "trot":
+		if B_W == 1 and self.metabot.mode == "trot":
 			self.metabot.crabVal = 30 - self.metabot.crabVal
 			orders.append(("crab",self.metabot.crabVal))
-		elif B_W == 1 and mode == "impro":
-			self.metabot.control(("Leg4",0))
+		elif B_W == 1 and self.metabot.mode == "impro":
+			orders.append(("Leg4",0))	
 
-		if B_N == 1 and mode == "trot":
+		if B_N == 1 and self.metabot.mode == "trot":
 			self.metabot.control(("toggleBackLegs", 0))
-		elif B_N == 1 and mode == "impro":
+		elif B_N == 1 and self.metabot.mode == "impro":
 			self.metabot.control(("Leg1",0))
 
-		if B_E == 1 and mode == "impro":
-			self.metabot.control(("Leg4",0))
+		if B_E == 1 and self.metabot.mode == "impro":
+			self.metabot.control(("Leg2",0))
 
-		if B_S == 1 and mode == "impro":
+		if B_S == 1 and self.metabot.mode == "impro":
 			self.metabot.control(("Leg3",0))
-
-		if B_E == 1:
-			self.metabot.control(("hello", 0))
 
 		if absHX == -1:
 			mid = random.randint(300,800)
@@ -84,10 +82,12 @@ class IHMetabot():
 		elif absHX == 1:
 			orders.append(("beepUntil",42,0))
 
-		if mode == "trot":
+		if self.metabot.mode == "trot" and self.metabot.started:
 			orders.append(("dx", dx))
 			orders.append(("dy", dy))
 			orders.append(("turn",turn))
+			if dh != 0:
+				orders.append(("h",self.metabot.h + dh))
 
 		orders.append(("freq",freq))
 		return orders
