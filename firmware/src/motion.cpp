@@ -102,6 +102,50 @@ TERMINAL_PARAMETER_FLOAT(gait, "Gait (1:trot, 2:music, 3:move, 4:impro)", GAIT_T
 
 
 #ifdef HAS_TERMINAL
+TERMINAL_COMMAND(extraX, "Shift leg(s) X")
+{
+    if (argc == 1) {
+        motion_extra_x(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_x(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraX [leg id] eX");
+    }
+}
+
+TERMINAL_COMMAND(extraY, "Shift leg(s) Y")
+{
+    if (argc == 1) {
+        motion_extra_y(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_y(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraY [leg id] eY");
+    }
+}
+
+TERMINAL_COMMAND(extraZ, "Shift leg(s) Z")
+{
+    if (argc == 1) {
+        motion_extra_z(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_z(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraZ [leg id] eZ");
+    }
+}
+
+TERMINAL_COMMAND(extraA, "Add angle to any motor")
+{
+    if (argc == 2) {
+        motion_extra_angle(4, atoi(argv[0]), atof(argv[1]));
+    } else if (argc == 3) {
+        motion_extra_angle(atoi(argv[0]), atoi(argv[1]), atoi(argv[2]));
+    } else {
+        terminal_io()->println("Usage: extraA [leg id] motor_id(0-2) eA");
+    }
+}
+
 TERMINAL_COMMAND(toggleBackLegs, "Toggle back legs")
 {
     if (backLegs == 0) backLegs = 1;
