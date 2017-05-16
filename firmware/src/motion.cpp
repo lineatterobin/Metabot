@@ -242,10 +242,10 @@ void motion_tick(float t)
 
     // Smoothing 180
     if (backLegs && smoothBackLegs < 1) {
-        smoothBackLegs += 0.02;
+        smoothBackLegs += 0.02; //TODO 50Hz
     }
     if (!backLegs && smoothBackLegs > 0) {
-        smoothBackLegs -= 0.02;
+        smoothBackLegs -= 0.02; //TODO 50Hz
     }
 
     float crabRad;
