@@ -1,3 +1,28 @@
+freq : Nb de pas (de chaque patte) par seconde
+backLegs : Booléen inversion des dernières phalanges
+dx, dy : Déplacement par pas en cm ?
+turn : Rotation en degré par pas
+crab : Décalage de l'angle des pattes en degré
+gait : Allure (1 = trot)
+support : Pourcentage de temps qu'une patte passe au sol
+alt : Hauteur d'un pas en ??? défaut 15
+
+
+
+smoothBackLegs : Position du retournement des pattes, lissée à 50Hz
+
+
+r : Rayon entre le centre du robot et la base des pattes
+h
+frontH
+
+toggleBackLegs : Inverse backLegs
+toggleCrab : 30 <=> 0 crab
+
+
+
+
+
 help:
         Displays the help about commands
 params:
