@@ -189,7 +189,7 @@ float motion_impro(int motor, int leg) {
             if (motor==2)
                 return perc.getMod(Lg[leg]);
             else if (motor==3) {
-                Lg[leg] = Lg[leg] + 0.1;
+                Lg[leg] = Lg[leg] + 0.05;
                 return 0.0;
             }
             else
@@ -200,7 +200,7 @@ float motion_impro(int motor, int leg) {
                 return glide.getMod(Lg[leg]);
             else if (motor==3) {
                 res = glide.getMod(Lg[leg]);
-                Lg[leg] = Lg[leg] + 0.1;
+                Lg[leg] = Lg[leg] + 0.05;
                 return res;
             }
             else
