@@ -66,6 +66,16 @@ def beep_rand_factory(min_freq):
         beep_command(min_freq + random.random()*100)
     return func
 
+
+def led_factory(color):
+    def func(unused):
+        del unused
+        if color is None:
+            command('led')
+        else:
+            command('led ' + str(color))
+    return func
+
 commands = {
     'name': 'commands',
     '\r': start_stop
@@ -89,6 +99,8 @@ beeps.update({beep_rand[i]: beep_rand_factory(50 + 100*i) for i in range(len(bee
 
 commands.update({'B': menu_factory(beeps)})
 
+commands.update({str(i): led_factory(i) for i in range(8)})
+commands['.'] = led_factory(None)
 
 def keys():
     state = {
