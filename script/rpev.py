@@ -35,7 +35,8 @@ def co(port="/dev/ttyACM0"):
     command('version')
 
 
-# Factory for generic function to change menu
+# ---------------- MAIN FUNCS ----------------
+
 def menu_factory(m):
     def func(state):
         state['menu'] = m
@@ -43,7 +44,6 @@ def menu_factory(m):
     return func
 
 
-# Alternatively starts and stops, not checking it worked
 def start_stop(state):
     if state['started']:
         command('stop')
@@ -121,20 +121,21 @@ beeps = {
 beeps.update({beep_keys[i]: beep_factory(i+48) for i in range(len(beep_keys))})
 beeps.update({beep_rand[i]: beep_rand_factory(50 + 100*i) for i in range(len(beep_rand))})
 
-commands.update({'B': menu_factory(beeps)})
+# Return to main menu
+commands['B'] = menu_factory(beeps)
 
 # ================ LEDS ================
 
-# Auto-populate :
-# 1 : Blue
-# 2 : Green
-# 3 : Cyan
-# 4 : Red
-# 5 : Magenta
-# 6 : Yellow(ish)
-# 7 : White
-# 0 : Off
-# . : Decustom
+# Auto-populate main menu:
+# 1: Blue
+# 2: Green
+# 3: Cyan
+# 4: Red
+# 5: Magenta
+# 6: Yellow(ish)
+# 7: White
+# 0: Off
+# .: Decustom
 commands.update({str(i): led_factory(i) for i in range(8)})
 commands['.'] = led_factory(None)
 
