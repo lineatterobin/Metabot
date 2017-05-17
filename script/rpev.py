@@ -4,6 +4,7 @@ import termios
 import serial
 import threading
 import random
+import inputs
 
 random.seed()
 
@@ -53,6 +54,76 @@ def start_stop(state):
         state['started'] = True
 
 
+# ---------------- GAMEPAD FUNCS ----------------
+
+gamepad_state = {
+    'l_stick': {'x': 0, 'y': 0, 'btn': 0},  # x => right ; y => down
+    'r_stick': {'x': 0, 'y': 0, 'btn': 0},  # +/- 2^15 (32768) ~10% giggle
+    'pad': {'up': 0, 'down': 0, 'left': 0, 'right': 0},
+    'triggers': {'left': 0, 'right': 0},  # 0-255
+    'shoulders': {'left': 0, 'right': 0},
+    'start': 0,
+    'select': 0,
+    'mode': 0,
+    'a': 0,
+    'b': 0,
+    'x': 0,
+    'y': 0
+}
+gamepad_state_lock = threading.Lock()
+
+event_interpretation = {
+    'ABS_X': ['l_stick', 'x'],
+    'ABS_Y': ['l_stick', 'y'],
+    'BTN_THUMBL': ['l_stick', 'btn'],
+    'ABS_RX': ['r_stick', 'x'],
+    'ABS_RY': ['r_stick', 'y'],
+    'BTN_THUMBR': ['r_stick', 'btn'],
+    'ABS_HAT0X': ['pad', 'left', 'right'],
+    'ABS_HAT0Y': ['pad', 'up', 'down'],
+    'ABS_Z': ['triggers', 'left'],
+    'ABS_RZ': ['triggers', 'right'],
+    'BTN_TL': ['shoulders', 'left'],
+    'BTN_TR': ['shoulders', 'right'],
+    'BTN_START': ['start'],
+    'BTN_SELECT': ['select'],
+    'BTN_MODE': ['mode'],
+    'BTN_SOUTH': ['a'],
+    'BTN_EAST': ['b'],
+    'BTN_NORTH': ['x'],
+    'BTN_WEST': ['y']
+}
+
+
+def gamepad_event_loop():
+    while True:
+        events = inputs.get_gamepad()
+        for event in events:
+            if event.ev_type != "Sync":
+                if event.code in event_interpretation:
+                    path = event_interpretation[event.code]
+                    gamepad_state_lock.acquire()
+                    if len(path) == 1:
+                        gamepad_state[path[0]] = event.state
+                    elif len(path) == 2:
+                        gamepad_state[path[0]][path[1]] = event.state
+                    else:  # Weird HAT0X/Y for pad
+                        if event.state > 0:
+                            gamepad_state[path[0]][path[2]] = event.state
+                        elif event.state < 0:
+                            gamepad_state[path[0]][path[1]] = -event.state
+                        else:
+                            gamepad_state[path[0]][path[2]] = event.state
+                            gamepad_state[path[0]][path[1]] = -event.state
+                    gamepad_state_lock.release()
+                else:
+                    print("Unknown event: ", event.code, event.state)
+        print(gamepad_state)
+
+gamepad_thread = threading.Thread(target=gamepad_event_loop)
+gamepad_thread.start()
+
+
 # ---------------- BEEPS FUNCS ----------------
 
 def beep_command(freq):
@@ -98,6 +169,16 @@ commands = {
     'name': 'commands',
     '\r': start_stop
 }
+
+# ================ GAMEPAD MAPPINGS ================
+
+mappings = {
+    'name': 'mappings',
+    '>': menu_factory(commands)
+}
+
+# Return to main menu
+commands['M'] = menu_factory(mappings)
 
 # ================ BEEPS ================
 
