@@ -13,7 +13,7 @@ class MetabotV2():
 	def start(self):
 		print("Start")
 		self.serial.write('start\r'.encode('utf-8'))
-		self.serial.flushInput()
+		self.serial.reset_input_buffer()
 		self.started = True
 
 	def check(self,command,value):
@@ -28,6 +28,8 @@ class MetabotV2():
 		elif command == "h":
 			value = 0 if value > 0 else (-130 if value < -130 else value)
 			self.h = value
+		elif command == "alt":
+			value = 45 if abs(value - 25) < 3 else value
 		return value
 
 	def control(self,order):
@@ -37,16 +39,16 @@ class MetabotV2():
 			value = value + " " + str(val)
 		print((order[0],value))
 		self.serial.write(('{} {}\r'.format(order[0],value)).encode('utf-8'))
-		self.serial.flushInput()
+		self.serial.reset_input_buffer()
 		
 	def stop(self):
 		print("Stop")
 		self.serial.write('stop\r'.encode('utf-8'))
-		self.serial.flushInput()
+		self.serial.reset_input_buffer()
 		self.started = False
 
 	def chmode(self,mode):
 		print("Mode " + mode)
 		self.mode = mode
 		self.serial.write(('{}\r'.format(mode)).encode('utf-8'))
-		self.serial.flushInput()
+		self.serial.reset_input_buffer()
