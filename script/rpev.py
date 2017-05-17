@@ -7,19 +7,24 @@ import random
 
 random.seed()
 
-term = None
-
-
 # To forward tty output with a thread
-def rd():
+term = None
+term_lock = threading.Lock()
+
+
+def read_int_tty_loop():
     while True:
+        term_lock.acquire()
         print(term.read().decode('utf-8'), end='')
-read_thread = threading.Thread(target=rd)
+        term_lock.release()
+read_thread = threading.Thread(target=read_int_tty_loop)
 
 
 # Generic to write a command to the tty
 def command(com):
+    term_lock.acquire()
     term.write((com+'\r').encode('utf-8'))
+    term_lock.release()
 
 
 # Establishing the connection (plus read thread & check connection with version)
