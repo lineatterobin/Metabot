@@ -9,7 +9,7 @@ frequency = 15
 metabotInput = Serial('/dev/ttyACM0', timeout=0.1)
 
 # Metabot output
-metabotOutput = Serial('/dev/pink')
+metabotOutput = Serial('/dev/rfcomm0')
 
 # Write timeout
 metabotInput.write_timeout = 0.5
