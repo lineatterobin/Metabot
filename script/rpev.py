@@ -119,7 +119,5 @@ def keys():
                 state['menu'][x](state)
             else:
                 print('Nothing for ', x)
-    except Exception:
+    finally:
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)
-
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)
