@@ -180,9 +180,31 @@ TERMINAL_COMMAND(specialmove, "change to gait move")
     dx = 0;
     dy = 0;
 }
+
+bool checkChecksum(char **argv)
+{
+    float sum = 0;
+    for (int i=0; i<6; i++) {
+        sum += atof(argv[i]);
+    }
+
+    float check = atof(argv[6]);
+
+    // Avoiding NaNs
+    if (sum == sum && check == check) {
+        // Checking that the sum is correct
+        float err = fabs(sum-check);
+        return err < 0.5;
+    } else {
+        return false;
+    }
+}
+
 TERMINAL_COMMAND(motor1, "Set motor's values")
 {
     if(gait == GAIT_MOVE) {
+        if (argc < 7) return;
+        if (!checkChecksum(argv)) return;
         for(int i=0; i<2; i++) {
             l1[i] = atof(argv[0+(i*3)]);
             l2[i] = atof(argv[1+(i*3)]);
@@ -193,6 +215,8 @@ TERMINAL_COMMAND(motor1, "Set motor's values")
 TERMINAL_COMMAND(motor2, "Set motor's values")
 {
     if(gait == GAIT_MOVE) {
+        if (argc < 7) return;
+        if (!checkChecksum(argv)) return;
         for(int i=2; i<4; i++) {
             l1[i] = atof(argv[-6+(i*3)]);
             l2[i] = atof(argv[-5+(i*3)]);
