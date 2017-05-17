@@ -177,7 +177,7 @@ mappings = {
     '>': menu_factory(commands)
 }
 
-# Return to main menu
+# Access from main menu
 commands['M'] = menu_factory(mappings)
 
 # ================ BEEPS ================
@@ -202,7 +202,7 @@ beeps = {
 beeps.update({beep_keys[i]: beep_factory(i+48) for i in range(len(beep_keys))})
 beeps.update({beep_rand[i]: beep_rand_factory(50 + 100*i) for i in range(len(beep_rand))})
 
-# Return to main menu
+# Access from main menu
 commands['B'] = menu_factory(beeps)
 
 # ================ LEDS ================
