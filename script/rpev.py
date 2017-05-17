@@ -10,27 +10,19 @@ random.seed()
 term = None
 
 
-def menu_factory(m):
-    def func(state):
-        state['menu'] = m
-        print(m['name'])
-    return func
-
-
+# To forward tty output with a thread
 def rd():
     while True:
         print(term.read().decode('utf-8'), end='')
 read_thread = threading.Thread(target=rd)
 
 
+# Generic to write a command to the tty
 def command(com):
     term.write((com+'\r').encode('utf-8'))
 
 
-def beep_command(freq):
-    command('beep ' + str(freq) + ' 10000')
-
-
+# Establishing the connection (plus read thread & check connection with version)
 def co(port="/dev/ttyACM0"):
     global term
     term = serial.Serial(port=port, baudrate=115200)
@@ -38,6 +30,15 @@ def co(port="/dev/ttyACM0"):
     command('version')
 
 
+# Factory for generic function to change menu
+def menu_factory(m):
+    def func(state):
+        state['menu'] = m
+        print(m['name'])
+    return func
+
+
+# Alternatively starts and stops, not checking it worked
 def start_stop(state):
     if state['started']:
         command('stop')
@@ -45,6 +46,12 @@ def start_stop(state):
     else:
         command('start')
         state['started'] = True
+
+
+# ---------------- BEEPS FUNCS ----------------
+
+def beep_command(freq):
+    command('beep ' + str(freq) + ' 10000')
 
 
 def beep_factory(midi=None, freq=None):
@@ -67,6 +74,8 @@ def beep_rand_factory(min_freq):
     return func
 
 
+# ---------------- LEDS FUNCS ----------------
+
 def led_factory(color):
     def func(unused):
         del unused
@@ -76,15 +85,24 @@ def led_factory(color):
             command('led ' + str(color))
     return func
 
+# ---------------- MENUS ----------------
+
+# ================ MAIN ================
+
 commands = {
     'name': 'commands',
     '\r': start_stop
 }
 
+# ================ BEEPS ================
+
+# Piano keyboard
 beep_keys = ['a', 'é', 'z', '"', 'e', 'r', '(', 't', '-', 'y', 'è', 'u',
              'w', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', ',',
              'A', '2', 'Z', '3', 'E', 'R', '5', 'T', '6', 'Y', '7', 'U',
              'W', 'S', 'X', 'D', 'C', 'V', 'G', 'B', 'H', 'N', 'J', '?']
+
+# Remaining keys to random beep
 beep_rand = ['_', 'ç', 'à', ')', '=', 'i', 'o', 'p', '^', '$',
              'k', 'l', 'm', 'ù', '*', ';', ':', '!']
 
@@ -94,13 +112,29 @@ beeps = {
     ' ': beep_factory()
 }
 
+# Populate with above key maps
 beeps.update({beep_keys[i]: beep_factory(i+48) for i in range(len(beep_keys))})
 beeps.update({beep_rand[i]: beep_rand_factory(50 + 100*i) for i in range(len(beep_rand))})
 
 commands.update({'B': menu_factory(beeps)})
 
+# ================ LEDS ================
+
+# Auto-populate :
+# 1 : Blue
+# 2 : Green
+# 3 : Cyan
+# 4 : Red
+# 5 : Magenta
+# 6 : Yellow(ish)
+# 7 : White
+# 0 : Off
+# . : Decustom
 commands.update({str(i): led_factory(i) for i in range(8)})
 commands['.'] = led_factory(None)
+
+
+# |-|-|-|-|-|-|-|-| Main function |-|-|-|-|-|-|-|-|
 
 def keys():
     state = {
