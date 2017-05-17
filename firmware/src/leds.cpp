@@ -1,4 +1,7 @@
 #include <stdio.h>
+#ifdef HAS_TERMINAL
+#include <terminal.h>
+#endif
 #include "leds.h"
 #ifdef RHOCK
 #include <rhock/stream.h>
@@ -63,4 +66,18 @@ void led_stream_state()
         rhock_stream_append(v);
     }
 #endif
+}
+
+TERMINAL_COMMAND(led, "Set led(s) value(s)")
+{
+    if (argc == 0) {
+        leds_decustom();
+        terminal_io()->println("LEDs decustomed. To modify use : led [motor id] color_code");
+    } else if (argc == 1) {
+        led_set_all(atoi(argv[0]), true);
+    } else if (argc == 2) {
+        led_set(atoi(argv[0]), atoi(argv[1]), true);
+    } else {
+        terminal_io()->println("Usage: led [motor id] color_code");
+    }
 }

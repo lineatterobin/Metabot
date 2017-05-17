@@ -39,9 +39,6 @@ void colorize()
             led_set(mapping[i], 0);
         }
     }
-    else {
-        led_set_all(color, true);
-    }
 }
 
 void remap(int direction)

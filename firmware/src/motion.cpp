@@ -102,6 +102,50 @@ TERMINAL_PARAMETER_FLOAT(gait, "Gait (1:trot, 2:music, 3:move, 4:impro)", GAIT_T
 
 
 #ifdef HAS_TERMINAL
+TERMINAL_COMMAND(extraX, "Shift leg(s) X")
+{
+    if (argc == 1) {
+        motion_extra_x(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_x(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraX [leg id] eX");
+    }
+}
+
+TERMINAL_COMMAND(extraY, "Shift leg(s) Y")
+{
+    if (argc == 1) {
+        motion_extra_y(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_y(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraY [leg id] eY");
+    }
+}
+
+TERMINAL_COMMAND(extraZ, "Shift leg(s) Z")
+{
+    if (argc == 1) {
+        motion_extra_z(4, atof(argv[0]));
+    } else if (argc == 2) {
+        motion_extra_z(atoi(argv[0]), atof(argv[1]));
+    } else {
+        terminal_io()->println("Usage: extraZ [leg id] eZ");
+    }
+}
+
+TERMINAL_COMMAND(extraA, "Add angle to any motor")
+{
+    if (argc == 2) {
+        motion_extra_angle(4, atoi(argv[0]), atof(argv[1]));
+    } else if (argc == 3) {
+        motion_extra_angle(atoi(argv[0]), atoi(argv[1]), atoi(argv[2]));
+    } else {
+        terminal_io()->println("Usage: extraA [leg id] motor_id(0-2) eA");
+    }
+}
+
 TERMINAL_COMMAND(toggleBackLegs, "Toggle back legs")
 {
     if (backLegs == 0) backLegs = 1;
@@ -136,9 +180,31 @@ TERMINAL_COMMAND(specialmove, "change to gait move")
     dx = 0;
     dy = 0;
 }
+
+bool checkChecksum(char **argv)
+{
+    float sum = 0;
+    for (int i=0; i<6; i++) {
+        sum += atof(argv[i]);
+    }
+
+    float check = atof(argv[6]);
+
+    // Avoiding NaNs
+    if (sum == sum && check == check) {
+        // Checking that the sum is correct
+        float err = fabs(sum-check);
+        return err < 0.5;
+    } else {
+        return false;
+    }
+}
+
 TERMINAL_COMMAND(motor1, "Set motor's values")
 {
     if(gait == GAIT_MOVE) {
+        if (argc < 7) return;
+        if (!checkChecksum(argv)) return;
         for(int i=0; i<2; i++) {
             l1[i] = atof(argv[0+(i*3)]);
             l2[i] = atof(argv[1+(i*3)]);
@@ -149,6 +215,8 @@ TERMINAL_COMMAND(motor1, "Set motor's values")
 TERMINAL_COMMAND(motor2, "Set motor's values")
 {
     if(gait == GAIT_MOVE) {
+        if (argc < 7) return;
+        if (!checkChecksum(argv)) return;
         for(int i=2; i<4; i++) {
             l1[i] = atof(argv[-6+(i*3)]);
             l2[i] = atof(argv[-5+(i*3)]);
@@ -242,10 +310,10 @@ void motion_tick(float t)
 
     // Smoothing 180
     if (backLegs && smoothBackLegs < 1) {
-        smoothBackLegs += 0.02;
+        smoothBackLegs += 0.02; //TODO 50Hz
     }
     if (!backLegs && smoothBackLegs > 0) {
-        smoothBackLegs -= 0.02;
+        smoothBackLegs -= 0.02; //TODO 50Hz
     }
 
     float crabRad;
